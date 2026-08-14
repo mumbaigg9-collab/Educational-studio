@@ -1,5 +1,7 @@
 {
   "name": "Class 10 Video Library",
+  "id": "/",
+  "description": "Watch educational videos organized by subject and chapter for Class 10 students.",
   "short_name": "Video Library",
   "start_url": "/",
   "display": "standalone",
