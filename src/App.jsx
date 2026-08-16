@@ -42,6 +42,12 @@ function getYouTubeId(url) {
   return m ? m[1] : null;
 }
 
+function getGoogleDriveId(url) {
+  if (!url) return null;
+  const m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=download&)?id=)([a-zA-Z0-9_-]{10,})/);
+  return m ? m[1] : null;
+}
+
 function getOrCreateDeviceId() {
   try {
     let id = window.localStorage.getItem(DEVICE_ID_KEY);
@@ -551,7 +557,7 @@ export default function App() {
                 ) : (
                   <div style={{ background: COLORS.card, border: `1px solid ${COLORS.cardBorder}`, borderRadius: 10, padding: 14 }}>
                     <input autoFocus value={videoTitle} onChange={(e) => setVideoTitle(e.target.value)} placeholder="Video title" style={{ ...inputStyle, width: "100%", marginBottom: 8 }} />
-                    <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="Video URL (YouTube or direct .mp4 link)" style={{ ...inputStyle, width: "100%" }} />
+                    <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="Video URL (YouTube, Google Drive, or direct .mp4 link)" style={{ ...inputStyle, width: "100%" }} />
                     <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
                       <button onClick={() => addVideo(videoTitle, videoUrl)} style={{ ...addBtnStyle, flex: "none" }}><Check size={16} /> Save</button>
                       <button onClick={() => { setShowVideoForm(false); setVideoTitle(""); setVideoUrl(""); }} style={{ ...addBtnStyle, flex: "none", color: COLORS.chalkDim, borderColor: COLORS.cardBorder }}><X size={16} /> Cancel</button>
@@ -791,11 +797,14 @@ function VideosView({ chapter, editingId, editingText, setEditingId, setEditingT
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {chapter.videos.map((v) => {
         const ytId = getYouTubeId(v.url);
+        const driveId = !ytId ? getGoogleDriveId(v.url) : null;
         return (
           <div key={v.id} style={{ background: COLORS.card, border: `1px solid ${COLORS.cardBorder}`, borderRadius: 10, overflow: "hidden" }}>
             <div style={{ aspectRatio: "16/9", background: COLORS.boardDark }}>
               {ytId ? (
                 <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${ytId}`} title={v.title} frameBorder="0" allowFullScreen style={{ display: "block" }} />
+              ) : driveId ? (
+                <iframe width="100%" height="100%" src={`https://drive.google.com/file/d/${driveId}/preview`} title={v.title} frameBorder="0" allow="autoplay" allowFullScreen style={{ display: "block" }} />
               ) : (
                 <video controls controlsList="nodownload" style={{ width: "100%", height: "100%" }} src={v.url} />
               )}
